@@ -166,14 +166,14 @@ class Trainer:
         return degrees
 
     def get_meta(self, left, right):
-        # left_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in left], axis=0))).cuda()
-        # left_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in left])).cuda()
-        # right_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in right], axis=0))).cuda()
-        # right_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in right])).cuda()
-        left_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in left], axis=0)))
-        left_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in left]))
-        right_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in right], axis=0)))
-        right_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in right]))
+        left_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in left], axis=0))).cuda()
+        left_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in left])).cuda()
+        right_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in right], axis=0))).cuda()
+        right_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in right])).cuda()
+#         left_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in left], axis=0)))
+#         left_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in left]))
+#         right_connections = Variable(torch.LongTensor(np.stack([self.connections[_,:,:] for _ in right], axis=0)))
+#         right_degrees = Variable(torch.FloatTensor([self.e1_degrees[_] for _ in right]))
         return (left_connections, left_degrees, right_connections, right_degrees)
 
     def reload(self):
