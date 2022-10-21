@@ -103,7 +103,7 @@ class RelationPull(nn.Module):
         super(RelationPull, self).__init__()
         self.channel_sz = channel_sz
         self.c_a = nn.Conv2d(self.channel_sz, self.channel_sz,groups = self.channel_sz,kernel_size=1, stride=1)
-        self.c_a.weight = torch.nn.Parameter(torch.ones(self.channel_sz, 1, 1, 1)).cuda()
+        self.c_a.weight = torch.nn.Parameter(torch.ones(self.channel_sz, 1, 1, 1))
 
     def forward(self, x):
         x = self.c_a(x)
@@ -254,7 +254,7 @@ class MetaR(nn.Module):
             orgkey = self.dev_key
 
         batch_size,channel_size,triple,dim = rel.size()
-        pull_model = RelationPull(channel_size)
+        pull_model = RelationPull(channel_size).to('cuda')
         pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
 
         pull_optimizer.zero_grad()
