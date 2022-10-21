@@ -103,7 +103,7 @@ class RelationPull(nn.Module):
         super(RelationPull, self).__init__()
         self.channel_sz = channel_sz
         self.c_a = nn.Conv2d(self.channel_sz, self.channel_sz,groups = self.channel_sz,kernel_size=1, stride=1)
-        self.c_a.weight = torch.nn.Parameter(torch.ones(self.channel_sz, 1, 1, 1))
+        self.c_a.weight = torch.nn.Parameter(torch.ones(self.channel_sz, 1, 1, 1)).cuda()
 
     def forward(self, x):
         x = self.c_a(x)
