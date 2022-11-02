@@ -165,11 +165,15 @@ class MetaR(nn.Module):
         self.rela_q_sharing = dict()
         self.hyper_sharing = dict()
         self.hyper_q_sharing = dict()
+        self.after_pull = dict()
         
         self.rel_similarity_cos = dict()
         self.rel_similarity_dist = dict()
         self.hyper_similarity_cos = dict()
         self.hyper_similarity_dist = dict()
+        
+        self.after_pull_cos = dict()
+        self.after_pull_dist = dict()
         
         self.rel_q_similarity_cos = dict()
         self.rel_q_similarity_dist = dict()
@@ -244,6 +248,16 @@ class MetaR(nn.Module):
 
 #         return self.rel_similarity_cos,self.rel_similarity_dist
         return self.rel_similarity_cos,self.rel_q_similarity_cos
+
+    def get_pull_sim(self):
+        for key in self.rel_sharing.keys():
+            self.after_pull_cos[key] = dict()
+            for _ in self.after_pull.keys():
+                if _ != key:
+                    sim_cos = torch.cosine_similarity(self.after_pull[key],self.after_pull[_],dim=0)
+                    self.after_pull_cos[key][_] = sim_cos
+        
+        return self.after_pull_cos
 
     def pull(self,rel,iseval = False):
         if not iseval:
@@ -326,6 +340,11 @@ class MetaR(nn.Module):
 
         self.pull(rel,iseval)
         rel.retain_grad()
+        
+        if not iseval:
+            for i in range(len(curr_rel)):
+                temp = torch.squeeze(rel[i])
+                self.after_pull[curr_rel[i]] = temp
 
         # relation for support
         rel_s = rel.expand(-1, few+num_sn, -1, -1)
@@ -360,12 +379,12 @@ class MetaR(nn.Module):
         que_neg_e1, que_neg_e2 = self.split_concat(query, negative)  # [bs, nq+nn, 1, es]
         if iseval:
             norm_q = self.h_norm
-        if not iseval:
-            for i in range(len(curr_rel)):
-                temp = torch.squeeze(rel_q[i])
-                self.rela_q_sharing[curr_rel[i]] = temp
-                temp_ = torch.squeeze(norm_q[i])
-                self.hyper_q_sharing[curr_rel[i]] = temp_
+#         if not iseval:
+#             for i in range(len(curr_rel)):
+#                 temp = torch.squeeze(rel_q[i])
+#                 self.rela_q_sharing[curr_rel[i]] = temp
+#                 temp_ = torch.squeeze(norm_q[i])
+#                 self.hyper_q_sharing[curr_rel[i]] = temp_
                 
         p_score, n_score = self.embedding_learner(que_neg_e1, que_neg_e2, rel_q, num_q, norm_q)
 
