@@ -310,11 +310,11 @@ class Trainer:
                 pull = self.metaR.after_pull
                 hyper_q = self.metaR.hyper_q_sharing
                 rel_q = self.metaR.rela_q_sharing
-                save_dic_tensor(rel,'rel'+str(e)) 
-                save_dic_tensor(rel_q,'rel_q'+str(e)) 
-                save_dic_tensor(hyper,'hyper'+str(e)) 
-                save_dic_tensor(hyper_q,'hyper_q'+str(e)) 
-                save_dic_tensor(pull,'pull'+str(e)) 
+                save_tensor(rel,'rel'+str(e)) 
+                save_tensor(rel_q,'rel_q'+str(e)) 
+                save_tensor(hyper,'hyper'+str(e)) 
+                save_tensor(hyper_q,'hyper_q'+str(e)) 
+                save_tensor(pull,'pull'+str(e)) 
 #                 rel_cos, rel_dist = self.metaR.get_rel_sim()
 #                 hyper_cos,hyper_dist = self.metaR.get_hyper_sim()
 #                 rel_cos, rel_q_cos = self.metaR.get_rel_sim()
