@@ -305,18 +305,28 @@ class Trainer:
                 print('Epoch  {} has finished, saving...'.format(e))
                 self.save_checkpoint(e)
             if e % 1500 == 0 and e != 0:
+                rel = self.metaR.rel_sharing
+                hyper = self.metaR.hyper_sharing
+                pull = self.metaR.after_pull
+                hyper_q = self.metaR.hyper_q_sharing
+                rel_q = self.metaR.rela_q_sharing
+                save_dic_tensor(rel,'rel'+str(e)) 
+                save_dic_tensor(rel_q,'rel_q'+str(e)) 
+                save_dic_tensor(hyper,'hyper'+str(e)) 
+                save_dic_tensor(hyper_q,'hyper_q'+str(e)) 
+                save_dic_tensor(pull,'pull'+str(e)) 
 #                 rel_cos, rel_dist = self.metaR.get_rel_sim()
 #                 hyper_cos,hyper_dist = self.metaR.get_hyper_sim()
-                rel_cos, rel_q_cos = self.metaR.get_rel_sim()
-                hyper_cos,hyper_q_cos = self.metaR.get_hyper_sim()
-                pull_sim = self.metaR.get_pull_sim()
-                save_dic_tensor(rel_cos,'rel_cos'+str(e))
-                save_dic_tensor(hyper_cos,'hyper_cos'+str(e))
+#                 rel_cos, rel_q_cos = self.metaR.get_rel_sim()
+#                 hyper_cos,hyper_q_cos = self.metaR.get_hyper_sim()
+#                 pull_sim = self.metaR.get_pull_sim()
+#                 save_dic_tensor(rel_cos,'rel_cos'+str(e))
+#                 save_dic_tensor(hyper_cos,'hyper_cos'+str(e))
 #                 save_dic_tensor(rel_dist,'rel_dist_'+str(e))
 #                 save_dic_tensor(hyper_dist,'hyper_dist'+str(e))
-                save_dic_tensor(rel_q_cos,'rel_q_cos'+str(e))
-                save_dic_tensor(hyper_q_cos,'hyper_q_cos'+str(e))
-                save_dic_tensor(pull_sim,'pull_sim'+str(e))
+#                 save_dic_tensor(rel_q_cos,'rel_q_cos'+str(e))
+#                 save_dic_tensor(hyper_q_cos,'hyper_q_cos'+str(e))
+#                 save_dic_tensor(pull_sim,'pull_sim'+str(e)) 
             # do evaluation on specific epoch
             if e % self.eval_epoch == 0 and e != 0:
                 print('Epoch  {} has finished, validating...'.format(e))
