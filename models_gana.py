@@ -379,12 +379,13 @@ class MetaR(nn.Module):
         que_neg_e1, que_neg_e2 = self.split_concat(query, negative)  # [bs, nq+nn, 1, es]
         if iseval:
             norm_q = self.h_norm
-#         if not iseval:
-#             for i in range(len(curr_rel)):
-#                 temp = torch.squeeze(rel_q[i])
-#                 self.rela_q_sharing[curr_rel[i]] = temp
-#                 temp_ = torch.squeeze(norm_q[i])
-#                 self.hyper_q_sharing[curr_rel[i]] = temp_
+            
+        if not iseval:
+            for i in range(len(curr_rel)):
+                temp = torch.squeeze(rel_q[i])
+                self.rela_q_sharing[curr_rel[i]] = temp
+                temp_ = torch.squeeze(norm_q[i])
+                self.hyper_q_sharing[curr_rel[i]] = temp_
                 
         p_score, n_score = self.embedding_learner(que_neg_e1, que_neg_e2, rel_q, num_q, norm_q)
 
