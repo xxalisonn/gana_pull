@@ -338,13 +338,13 @@ class MetaR(nn.Module):
                 temp_ = torch.squeeze(norm_vector[i])
                 self.hyper_sharing[curr_rel[i]] = temp_
 
-        self.pull(rel,iseval)
-        rel.retain_grad()
+#         self.pull(rel,iseval)
+#         rel.retain_grad()
         
-        if not iseval:
-            for i in range(len(curr_rel)):
-                temp = torch.squeeze(rel[i])
-                self.after_pull[curr_rel[i]] = temp
+#         if not iseval:
+#             for i in range(len(curr_rel)):
+#                 temp = torch.squeeze(rel[i])
+#                 self.after_pull[curr_rel[i]] = temp
 
         # relation for support
         rel_s = rel.expand(-1, few+num_sn, -1, -1)
