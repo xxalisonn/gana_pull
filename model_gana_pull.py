@@ -268,7 +268,7 @@ class MetaR(nn.Module):
             orgkey = self.dev_key
 
         batch_size,channel_size,triple,dim = rel.size()
-        pull_model = RelationPull(channel_size)
+        pull_model = RelationPull(channel_size).to('cuda')
         pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
         for i in range(10):
             pull_optimizer.zero_grad()
