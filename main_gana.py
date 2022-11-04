@@ -35,7 +35,7 @@ if __name__ == '__main__':
     print("loading test_tasks ... ...")
     dataset['test_tasks'] = json.load(open(data_dir['test_tasks']))
     print("loading dev_tasks ... ...")
-    dataset['dev_tasks'] = json.load(open(data_dir['dev_tasks'+tail_]))
+    dataset['dev_tasks'] = json.load(open(data_dir['dev_tasks']))
     print("loading rel2candidates{} ... ...".format(tail))
     dataset['rel2candidates'] = json.load(open(data_dir['rel2candidates'+tail]))
     print("loading e1rel_e2{} ... ...".format(tail))
