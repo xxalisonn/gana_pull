@@ -16,7 +16,9 @@ if __name__ == '__main__':
         SEED = params['seed']
         torch.manual_seed(SEED)
         torch.cuda.manual_seed(SEED)
+        torch.cuda.manual_seed_all(SEED)
         torch.backends.cudnn.deterministic = True
+        torch.backends.cudann.benchmark = False
         np.random.seed(SEED)
         random.seed(SEED)
 
