@@ -158,6 +158,10 @@ class MetaR(nn.Module):
         elif parameter['dataset'] == 'NELL-One':
             self.relation_learner = LSTM_attn(embed_size=100, n_hidden=450, out_size=100, layers=2)
         self.embedding_learner = EmbeddingLearner()
+        
+        pull_model = RelationPull(channel_sz=1).to('cuda')
+        pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
+        
         self.loss_func = nn.MarginRankingLoss(self.margin)
         self.rel_q_sharing = dict()
         
@@ -268,11 +272,9 @@ class MetaR(nn.Module):
             orgkey = self.dev_key
 
         batch_size,channel_size,triple,dim = rel.size()
-        pull_model = RelationPull(channel_size).to('cuda')
-        pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
         for i in range(10):
-            pull_optimizer.zero_grad()
-            output = pull_model(rel)
+            self.pull_optimizer.zero_grad()
+            output = self.pull_model(rel)
             proto = torch.mean(output,dim=1)
             proto = torch.squeeze(proto)
 
@@ -303,7 +305,7 @@ class MetaR(nn.Module):
 
             batch_loss = -1 * torch.log((class_inner_sim - 0.5) / (1 - class_outer_sim))
             batch_loss.backward(retain_graph=True)
-            pull_optimizer.step()
+            self.pull_optimizer.step()
 
         return output
 
