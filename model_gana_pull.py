@@ -160,7 +160,7 @@ class MetaR(nn.Module):
         self.embedding_learner = EmbeddingLearner()
         
         self.pull_model = RelationPull(channel_sz=1).to('cuda')
-        self.pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
+        self.pull_optimizer = torch.optim.Adam(self.pull_model.parameters(), 0.001)
         
         self.loss_func = nn.MarginRankingLoss(self.margin)
         self.rel_q_sharing = dict()
