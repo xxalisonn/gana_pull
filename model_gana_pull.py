@@ -159,8 +159,8 @@ class MetaR(nn.Module):
             self.relation_learner = LSTM_attn(embed_size=100, n_hidden=450, out_size=100, layers=2)
         self.embedding_learner = EmbeddingLearner()
         
-        pull_model = RelationPull(channel_sz=1).to('cuda')
-        pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
+        self.pull_model = RelationPull(channel_sz=1).to('cuda')
+        self.pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
         
         self.loss_func = nn.MarginRankingLoss(self.margin)
         self.rel_q_sharing = dict()
