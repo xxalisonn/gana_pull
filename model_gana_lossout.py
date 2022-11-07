@@ -114,6 +114,7 @@ class MetaR(nn.Module):
         super(MetaR, self).__init__()
         self.device = parameter['device']
         self.beta = parameter['beta']
+        self.gama = parameter['gama']
         self.dropout_p = parameter['dropout_p']
         self.embed_dim = parameter['embed_dim']
         self.margin = parameter['margin']
@@ -271,7 +272,8 @@ class MetaR(nn.Module):
         # batch_size, channel_size, triple, dim = rel.size()
         # pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
         # pull_optimizer.zero_grad()
-        output = self.pull_model(rel)
+#         output = self.pull_model(rel)
+        output = rel
         proto = torch.mean(output, dim=1)
         proto = torch.squeeze(proto)
 
@@ -332,11 +334,10 @@ class MetaR(nn.Module):
         rel = self.relation_learner(support_few)
         rel.retain_grad()
         
-        rel_,pull_loss = self.pull(rel, iseval)
-        rel_.retain_grad()
+        pull_loss = self.pull(rel, iseval)
 
         # relation for support
-        rel_s = rel_.expand(-1, few+num_sn, -1, -1)
+        rel_s = rel.expand(-1, few+num_sn, -1, -1)
         if iseval and curr_rel != '' and curr_rel in self.rel_q_sharing.keys():
             rel_q = self.rel_q_sharing[curr_rel]
 
@@ -349,13 +350,13 @@ class MetaR(nn.Module):
 
                 y = torch.ones(p_score.size()).cuda()
                 self.zero_grad()
-                loss = self.loss_func(p_score, n_score, y) + 0.5*pull_loss
+                loss = self.loss_func(p_score, n_score, y) + self.gama * pull_loss
                 loss.backward(retain_graph=True)
-                grad_meta = rel_.grad
-                rel_q = rel_ - self.beta*grad_meta
+                grad_meta = rel.grad
+                rel_q = rel - self.beta*grad_meta
                 norm_q = norm_vector - self.beta*grad_meta				# hyper-plane update
             else:
-                rel_q = rel_
+                rel_q = rel
                 norm_q = norm_vector
 
             self.rel_q_sharing[curr_rel] = rel_q
