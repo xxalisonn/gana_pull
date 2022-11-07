@@ -350,7 +350,7 @@ class MetaR(nn.Module):
 
                 y = torch.ones(p_score.size()).cuda()
                 self.zero_grad()
-                loss = self.loss_func(p_score, n_score, y) + gama * pull_loss
+                loss = self.loss_func(p_score, n_score, y) 
                 loss_ = loss + self.gama * pull_loss
                 loss_.backward(retain_graph=True)
                 grad_meta = rel.grad
