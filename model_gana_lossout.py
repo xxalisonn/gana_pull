@@ -332,9 +332,8 @@ class MetaR(nn.Module):
             support_few = torch.cat((support_few, support_pair), dim=1)
         support_few = support_few.view(support_few.shape[0], self.few, 2, self.embed_dim)
         rel = self.relation_learner(support_few)
-        rel.retain_grad()
-        
         pull_loss = self.pull(rel, iseval)
+        rel.retain_grad()
 
         # relation for support
         rel_s = rel.expand(-1, few+num_sn, -1, -1)
@@ -350,7 +349,7 @@ class MetaR(nn.Module):
 
                 y = torch.ones(p_score.size()).cuda()
                 self.zero_grad()
-                loss = self.loss_func(p_score, n_score, y) + 0.5 * pull_loss
+                loss = self.loss_func(p_score, n_score, y) + pull_loss
                 loss.backward(retain_graph=True)
                 grad_meta = rel.grad
                 rel_q = rel - self.beta*grad_meta
