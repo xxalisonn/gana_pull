@@ -158,6 +158,7 @@ class MetaR(nn.Module):
         elif parameter['dataset'] == 'NELL-One':
             self.relation_learner = LSTM_attn(embed_size=100, n_hidden=450, out_size=100, layers=2)
         self.embedding_learner = EmbeddingLearner()
+        self.pull_model = RelationPull(channel_sz=1)
         self.loss_func = nn.MarginRankingLoss(self.margin)
         self.rel_q_sharing = dict()
         
