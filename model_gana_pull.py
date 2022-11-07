@@ -367,6 +367,7 @@ class MetaR(nn.Module):
                 loss = self.loss_func(p_score, n_score, y)
 #                 loss.backward(retain_graph=True)
                 loss1 = loss.detach_().requires_grad_(True)
+                loss1.backward(retain_graph=True)
                 grad_meta = rel.grad
                 rel_q = rel - self.beta*grad_meta
                 norm_q = norm_vector - self.beta*grad_meta				# hyper-plane update
