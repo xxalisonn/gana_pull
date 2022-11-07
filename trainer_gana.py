@@ -1,4 +1,4 @@
-from model_gana_pull import *
+from model_gana_lossout import *
 from tensorboardX import SummaryWriter
 import os
 import sys
