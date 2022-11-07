@@ -259,7 +259,7 @@ class MetaR(nn.Module):
         
         return self.after_pull_cos
 
-    def pull(self,rel,iseval = False):
+    def pull(self, rel, iseval=False):
         if not iseval:
             id2rel = self.train_rel2id
             orgkey = self.train_key
@@ -267,45 +267,43 @@ class MetaR(nn.Module):
             id2rel = self.dev_rel2id
             orgkey = self.dev_key
 
-        batch_size,channel_size,triple,dim = rel.size()
-        pull_model = RelationPull(channel_size).to('cuda')
-        pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
-        for i in range(5):
-            pull_optimizer.zero_grad()
-            output = pull_model(rel)
-            proto = torch.mean(output,dim=1)
-            proto = torch.squeeze(proto)
+        # batch_size, channel_size, triple, dim = rel.size()
+        # pull_optimizer = torch.optim.Adam(pull_model.parameters(), 0.001)
+        # pull_optimizer.zero_grad()
+        output = self.pull_model(rel)
+        proto = torch.mean(output, dim=1)
+        proto = torch.squeeze(proto)
 
-            class_outer_sim = 0
-            class_inner_sim = 0
-            for relation in orgkey:
-                dic = self.handsim[relation]
-                rel_id = id2rel[relation]
-                if len(dic['Sim'])>0:
-                    inner = 0
-                    i = 0
-                    for _ in dic['Org']:
-                        i +=1
-                        inner += torch.cosine_similarity(proto[rel_id],proto[id2rel[_]],dim=0)
-                    for _ in dic['Rev']:
-                        i +=1
-                        inner += torch.cosine_similarity(proto[rel_id],-proto[id2rel[_]],dim=0)
-                    if i>0:
-                        class_inner_sim += inner/i
-                if len(dic['Dist'])>0:
-                    outer = 0
-                    i = 0
-                    for _ in dic['Dist']:
-                        i +=1
-                        outer += torch.cosine_similarity(proto[rel_id],proto[id2rel[_]],dim=0)
-                    if i > 0:
-                        class_outer_sim += outer / i
+        class_outer_sim = 0
+        class_inner_sim = 0
+        for relation in orgkey:
+            dic = self.handsim[relation]
+            rel_id = id2rel[relation]
+            if len(dic['Sim']) > 0:
+                inner = 0
+                i = 0
+                for _ in dic['Org']:
+                    i += 1
+                    inner += torch.cosine_similarity(proto[rel_id], proto[id2rel[_]], dim=0)
+                for _ in dic['Rev']:
+                    i += 1
+                    inner += torch.cosine_similarity(proto[rel_id], -proto[id2rel[_]], dim=0)
+                if i > 0:
+                    class_inner_sim += inner / i
+            if len(dic['Dist']) > 0:
+                outer = 0
+                i = 0
+                for _ in dic['Dist']:
+                    i += 1
+                    outer += torch.cosine_similarity(proto[rel_id], proto[id2rel[_]], dim=0)
+                if i > 0:
+                    class_outer_sim += outer / i
 
-            batch_loss = -1 * torch.log((class_inner_sim - 0.5) / (1 - class_outer_sim))
-            batch_loss.backward(retain_graph=True)
-            pull_optimizer.step()
+        batch_loss = -1 * torch.log((class_inner_sim - 0.5) / (1 - class_outer_sim))
+        # batch_loss.backward(retain_graph=True)
+        # pull_optimizer.step()
 
-        return output
+        return output,batch_loss
 
     def forward(self, task, iseval=False, curr_rel='', support_meta=None, istest=False):
         # transfer task string into embedding
@@ -332,25 +330,12 @@ class MetaR(nn.Module):
         support_few = support_few.view(support_few.shape[0], self.few, 2, self.embed_dim)
         rel = self.relation_learner(support_few)
         rel.retain_grad()
-
-        if not iseval:
-            for i in range(len(curr_rel)):
-                temp = torch.squeeze(rel[i])
-                self.rel_sharing[curr_rel[i]] = temp
-                temp_ = torch.squeeze(norm_vector[i])
-                self.hyper_sharing[curr_rel[i]] = temp_
-
-        pull_rel = rel.clone()
-        rel_ = self.pull(pull_rel,iseval)
-        rell = rel_.clone()
         
-#         if not iseval:
-#             for i in range(len(curr_rel)):
-#                 temp = torch.squeeze(rel[i])
-#                 self.after_pull[curr_rel[i]] = temp
+        rel_,pull_loss = self.pull(rel, iseval)
+        rel_.retain_grad()
 
         # relation for support
-        rel_s = rell.expand(-1, few+num_sn, -1, -1)
+        rel_s = rel_.expand(-1, few+num_sn, -1, -1)
         if iseval and curr_rel != '' and curr_rel in self.rel_q_sharing.keys():
             rel_q = self.rel_q_sharing[curr_rel]
 
@@ -363,14 +348,13 @@ class MetaR(nn.Module):
 
                 y = torch.ones(p_score.size()).cuda()
                 self.zero_grad()
-                loss = self.loss_func(p_score, n_score, y)
-                loss1 = loss.detach_().requires_grad_(True)
-                loss1.backward(retain_graph=True)
-                grad_meta = rel.grad
-                rel_q = rel - self.beta*grad_meta
+                loss = self.loss_func(p_score, n_score, y) + 0.5*pull_loss
+                loss.backward(retain_graph=True)
+                grad_meta = rel_.grad
+                rel_q = rel_ - self.beta*grad_meta
                 norm_q = norm_vector - self.beta*grad_meta				# hyper-plane update
             else:
-                rel_q = rel
+                rel_q = rel_
                 norm_q = norm_vector
 
             self.rel_q_sharing[curr_rel] = rel_q
