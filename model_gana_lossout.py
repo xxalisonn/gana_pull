@@ -350,9 +350,9 @@ class MetaR(nn.Module):
 
                 y = torch.ones(p_score.size()).cuda()
                 self.zero_grad()
-                gama = float(self.gama)
                 loss = self.loss_func(p_score, n_score, y) + gama * pull_loss
-                loss.backward(retain_graph=True)
+                loss_ = loss + self.gama * pull_loss
+                loss_.backward(retain_graph=True)
                 grad_meta = rel.grad
                 rel_q = rel - self.beta*grad_meta
                 norm_q = norm_vector - self.beta*grad_meta				# hyper-plane update
