@@ -306,7 +306,7 @@ class MetaR(nn.Module):
         # batch_loss.backward(retain_graph=True)
         # pull_optimizer.step()
 
-        return output,batch_loss
+        return batch_loss
 
     def forward(self, task, iseval=False, curr_rel='', support_meta=None, istest=False):
         # transfer task string into embedding
@@ -349,7 +349,7 @@ class MetaR(nn.Module):
 
                 y = torch.ones(p_score.size()).cuda()
                 self.zero_grad()
-                loss = self.loss_func(p_score, n_score, y) + pull_loss
+                loss = self.loss_func(p_score, n_score, y) + self.gama * pull_loss
                 loss.backward(retain_graph=True)
                 grad_meta = rel.grad
                 rel_q = rel - self.beta*grad_meta
