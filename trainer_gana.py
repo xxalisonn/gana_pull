@@ -307,14 +307,14 @@ class Trainer:
             if e % 1500 == 0 and e != 0:
                 rel = self.metaR.rel_sharing
                 hyper = self.metaR.hyper_sharing
-                pull = self.metaR.after_pull
+#                 pull = self.metaR.after_pull
                 hyper_q = self.metaR.hyper_q_sharing
                 rel_q = self.metaR.rela_q_sharing
                 save_tensor(rel,'rel'+str(e)) 
                 save_tensor(rel_q,'rel_q'+str(e)) 
                 save_tensor(hyper,'hyper'+str(e)) 
                 save_tensor(hyper_q,'hyper_q'+str(e)) 
-                save_tensor(pull,'pull'+str(e)) 
+#                 save_tensor(pull,'pull'+str(e)) 
 #                 rel_cos, rel_dist = self.metaR.get_rel_sim()
 #                 hyper_cos,hyper_dist = self.metaR.get_hyper_sim()
 #                 rel_cos, rel_q_cos = self.metaR.get_rel_sim()
