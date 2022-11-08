@@ -304,7 +304,7 @@ class Trainer:
             if e % self.checkpoint_epoch == 0 and e != 0:
                 print('Epoch  {} has finished, saving...'.format(e))
                 self.save_checkpoint(e)
-            if e % 1500 == 0 and e != 0:
+            if e % 1000 == 0 and e != 0:
                 rel = self.metaR.rel_sharing
                 hyper = self.metaR.hyper_sharing
 #                 pull = self.metaR.after_pull
